@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      font-size: large;
+    }
+
+    label {
+      display: inline-block; 
+      width: 150px; 
+      height: 50px;
+    }
+
+    select {
+      display: inline-block; 
+      width: 300px; 
+      font-size: large;
+      /* height: 50px; */
+    }
+
+    input {
+      display: inline-block; 
+      width: 292px; 
+      font-size: large;
+      /* height: 50px; */
+    }
+
+    p {
+      border-style: solid;
+      border-color: black;
+      padding: 15px;
+      align-items: center;
+      display: inline-block;
+    }
+
+    button {
+      height: 50px;
+      font-size: large;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="width: 35%; display: inline-block;">
+
+  </div>
+  <p>
+    <label>Tình trạng: </label>
+    <select name="isused" id="isused">
+      <option value="used">Đã qua sử dụng</option>
+      <option value="new">Mới</option>
+    </select><br />
+  
+    <label>Hãng: </label>
+    <select name="brand" id="brand">
+    </select><br />
+  
+    <label>Model: </label>
+    <select name="model" id="model">
+    </select><br />
+  
+    <label>KMS: </label>
+    <input id="kms" type="number" min="0" value="100"/><br />
+  
+    <label>Loại: </label>
+    <select name="type" id="type">
+    </select><br />
+  
+    <label>Năm sản xuất: </label>
+    <input id="year" type="number" min="1900" max="2099" step="1" value="2016" /><br />
+  
+    <label>Capacity: </label>
+    <input id="capacity" type="number" min="0" value="100"/><br />
+  
+    <label>Tỉnh: </label>
+    <select name="province" id="province">
+    </select><br />
+
+    <button id="submit-btn" onclick="onSubmit()">Dự đoán</button>
+    <br />  <br /> <br /> 
+    <label>Giá dự đoán</label>
+    <label id="ret-label">None</label>
+  </div>
+
+</body>
+
+<script>
+  const brands = ["Halim", "KTM", "Taya Motor", "Piaggio", "CPI", "MV Agusta", "Visitor", 
+  "Daelim", "Hero Honda", "Benelli", "Việt Thái", "Keeway", "Kengo", "Byvin", "Bosscity", 
+  "RebelUSA", "Bajaj", "SYM", "Harley Davidson", "Peugeot", "Honda", "Kymco", "Espero", 
+  "Kawasaki", "Aprillia", "Mobylette", "Norton", "Suzuki", "Triumph", "GPX", "BMW", "Vento", 
+  "Brixton", "CR&S", "Yamaha", "Sanda", "Nioshima", "Ducati"]
+
+  const brandSelector = document.getElementById("brand")
+  brands.forEach(element => {
+    const elm = document.createElement("option")
+    elm.setAttribute("value", element)
+    elm.innerText = element
+    brandSelector.appendChild(elm)
+  });
+
+  const models = ["Ducati mini", "T15", "Nova Tena", "BWs", "302R", "Duke 200", "Việt Thái Win", 
+  "Duke", "Crea ", "Satria", "Hartford MyDream", "CMX", "Enduro 250 ", "NHX110 Lead", "Cygnus", 
+  "GN", "Winner", "RoadSport", "Phoenix", "MT", "Plearsure", "Legend", "Boss", "Grand", "Classico", 
+  "Royal", "Janus", "PCX", "Chaly", "Master", "Saxby", "FZ", "Sonic", "PS", "Caponord 1200 ABS Travel Pack", 
+  "RG Sport", "Super Cub", "Grande", "Fino", "Sport", "YP 250 Majesty", "250 Rebel", "C 400", "Citi", 
+  "W175", "Vulcan", "Scoopy", "Zoomer X", "CBR", "Custom", "VIVA", "Taurus", "Adventurer", "Magna", "Xbike", 
+  "DD", "Dio", "GL ", "Daystar", "Triumph Tiger Explorer XC", "ADV", "RC", "splendor", "Attila", "C1", 
+  "K-Pipe", "W650", "Astrea", "150cc", "150", "HJ", "Việt Thái Cub", "DR-Z", "Nouvo 3", "Nouvo 1", "History", 
+  "Dylan", "YZF", "Rebellian", "Vega Force", "KPR", "Honda Beat", "Address", "Brixton Classic 125", "Lexam", 
+  "VUN", "Impulse", "GL MAX", "Scrambler", "Joyride", "Beat", "GZ", "Wolf", "Road Glide", "Exciter", "Nioshima S", 
+  "CB", "Zoomer", "Elizabeth", "Street Twin", "SCV 100 Lead", "REVO", "XDiavel", "Smash", "Super Dream", "Mobylette", 
+  "Shadow", "Halim Sirius", "Vision", "Win", "LA", "Candy S 50", "Demon 150GN", "CD", "Angela", "Liberty", 
+  "BX", "Raider", "Vespa", "Mio", "FX", "Acruzo", "Blackster 250 EFI", "CRF", "LEAD", "Brixton Rayburn 125", 
+  "Sirius", "Wave", "Kpipe 50", "Hunk", "Elite", "Monster", "Sportster", "Visar 50", "Nozza", "S1000 R", 
+  "SCR", "Hypermotard", "Airblade", "Hayate", "GD", "Pantheon", "Django", "R nineT Scrambler", "Rebel", 
+  "750 Shadow", "FZS", "Candy", "Sport Cup", "Freeway", "ET8", "Versys", "CM", "Shark", "EN", "Jupiter", 
+  "SuperSport", "W800", "Turismo Veloce", "Brixton Cafe Racer 150 ", "Razer ", "Bonus", "elite", "R250", 
+  "Commando", "R 1250 GS Adventure", "Notus", "125ZR", "Julio", "VJF 125 RoadSport", "Vario", "Benelli Tornado", 
+  "GTR", "CA", "Cub", "Brixton Classic 150 ", "Candy HI 110", "CG Dream", "Force", "Brixton Scrambler 150", 
+  "Crystal", "E-Five", "W400", "Nouvo 5", "Spacy", "RC 200", "Stinger", "Forza", "R3", "S1000 RR", "Z", 
+  "Excel", "ER-6n", "S50", "BN", "Zip", "Demon ", "Pulsar", "Symphony", "TFX", "R15", "T", "Angel", 
+  "Hussar", "Bella", "VT", "GSX", "Medley", "Forty-Eight", "Blade", "KLX", "Detech Cub ", "TNT", 
+  "People", "Thunder", "Elegant", "Street Scramber", "VC", "Cub 81 ", "Estrella", "H", "Like", "Star", 
+  "MSX", "67", "Steed", "X1", "68", "Future 2", "Click", "Yass", "Max", "Tuono 660", "G 310 R", "Ninja", 
+  "Nouvo 2", "Luvias", "Enjoy", "Honda CBR", "Delfino", "YP 250 Majesty Deluxe", "Cuxi", "Detech Wave ", 
+  "Dream", "Nouvo", "Sport/ Xipo", "Caffe Nero", "SH", "Nouvo 4", "Fortune", "Street glide", "Việt Thái Wave ", 
+  "DJ", "F3", "X-ADV", "NC", "Venus", "Nouvo 6", "Crea Scoopy", "Virago", "Future", "@", "AXELO", "Nova Dash", 
+  "NVX", "Winner X", "TRK", "Dragster", "Future 1", "Freego", "F4", "Galaxy", "Husky", "Deluxe", "Avenger", 
+  "Candy HI 50", "Fly"]
+
+  const modelSelector = document.getElementById("model")
+  models.forEach(element => {
+    const elm = document.createElement("option")
+    elm.setAttribute("value", element)
+    elm.innerText = element
+    modelSelector.appendChild(elm)
+  });
+
+  const provinces = ["Tỉnh Thanh Hóa", "Tỉnh Tuyên Quang", "Tỉnh Tiền Giang", "Tỉnh Kon-tum", "Tỉnh Nghệ An", 
+  "Tỉnh Khánh Hòa", "Tỉnh Quảng Ninh", "Tỉnh Hòa Bình", "Tỉnh Cà Mau", "Tỉnh Quảng Trị", "Tỉnh Bà Rịa-vũng Tàu", 
+  "Tỉnh Vĩnh Long", "Tỉnh Bình Định", "Tỉnh Quảng Ngãi", "Tỉnh Điện Biên", "Tỉnh Bắc Giang", "Tỉnh An Giang", 
+  "Tỉnh Thái Nguyên", "Tỉnh Lai Châu", "Tỉnh Hà Giang", "Tp. Hải Phòng", "Tỉnh Ninh Bình", "Tỉnh Bình Dương", 
+  "Tỉnh Kiên Giang", "Tỉnh Đồng Nai", "Tỉnh Lạng Sơn", "Tỉnh Đắk Lắk", "Tỉnh Hà Tĩnh", "Tỉnh Sóc Trăng", 
+  "Tỉnh Yên Bái", "Tỉnh Bến Tre", "Tỉnh Đắk Nông", "Tỉnh Ninh Thuận", "Tỉnh Quảng Nam", "Tỉnh Hà Nam", 
+  "Tp. Cần Thơ", "Tỉnh Hậu Giang", "Tỉnh Đồng Tháp", "Tp. Đà Nẵng", "Tỉnh Hưng Yên", "Tỉnh Nam Định", 
+  "Tỉnh Cao Bằng", "Tỉnh Quảng Bình", "Tỉnh Bạc Liêu", "Tp. Hà Nội", "Tỉnh Bắc Kạn", "Tp. Hồ Chí Minh", 
+  "Tỉnh Bắc Ninh", "Tỉnh Bình Phước", "Tỉnh Lâm Đồng", "Tỉnh Gia Lai", "Tỉnh Sơn La", "Tỉnh Tây Ninh", 
+  "Tỉnh Thừa Thiên-huế", "Tỉnh Long An", "Tỉnh Bình Thuận", "Tỉnh Phú Thọ", "Tỉnh Lào Cai", "Tỉnh Trà Vinh", 
+  "Tỉnh Vĩnh Phúc", "Tỉnh Thái Bình", "Tỉnh Hải Dương", "Tỉnh Phú Yên"]
+
+  const provinceSelector = document.getElementById("province")
+  provinces.forEach(element => {
+    const elm = document.createElement("option")
+    elm.setAttribute("value", element)
+    elm.innerText = element
+    provinceSelector.appendChild(elm)
+  });
+
+  const types = ["Xe số", "PKL", "Xe tay ga"]
+
+  const typeSelector = document.getElementById("type")
+  types.forEach(element => {
+    const elm = document.createElement("option")
+    elm.setAttribute("value", element)
+    elm.innerText = element
+    typeSelector.appendChild(elm)
+  });
+
+  const isusedSelector = document.getElementById("isused")
+  const yearInput = document.getElementById("year")
+  const kmsInput = document.getElementById("kms")
+  const capacityInput = document.getElementById("capacity")
+  const retLabel = document.getElementById("ret-label")
+
+  const onSubmit = () => {
+    const payload = {
+      'isused'   : isusedSelector.options[isusedSelector.selectedIndex].value, 
+      'brand'    : brandSelector.options[brandSelector.selectedIndex].value, 
+      'model'    : modelSelector.options[modelSelector.selectedIndex].value, 
+      'kms'      : kmsInput.value, 
+      'type'     : typeSelector.options[typeSelector.selectedIndex].value, 
+      'year'     : yearInput.value, 
+      'capacity' : capacityInput.value, 
+      'province' : provinceSelector.options[provinceSelector.selectedIndex].value
+    }
+
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    headers.append('Accept', 'application/json');
+    headers.append('Access-Control-Allow-Origin', 'http://localhost:3000');
+    headers.append('Access-Control-Allow-Credentials', 'true');
+    headers.append('GET', 'POST', 'OPTIONS');
+
+    fetch(`http://localhost:3000/predict`, {
+      method  : 'POST',
+      headers : headers,
+      body    : JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      retLabel.innerText = data.price
+    });
+  }
+
+</script>
+
+</html>
