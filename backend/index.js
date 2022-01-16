@@ -65,6 +65,9 @@ app.listen(PORT, HOST, () => {
 
 function init() {
   const ret = pythonInterpreter.Execute(`
+import os
+import sys
+sys.argv.append('')
 from tensorflow import keras
 import pandas as pd
 import json
