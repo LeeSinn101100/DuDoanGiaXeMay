@@ -49,7 +49,7 @@ values = [
   ${data.capacity}, 
   '${data.province}'
 ]
-predict(values)
+print(predict(values))
   `
   const ret = pythonInterpreter.Execute(str)
   
